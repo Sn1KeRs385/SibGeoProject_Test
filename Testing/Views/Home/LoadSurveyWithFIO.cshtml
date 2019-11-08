@@ -1,0 +1,73 @@
+﻿@using Testing.Models
+@model VM_LoadSurveyWithFIO
+<div>
+    <input type="button" class="btn btn-success" style="float:right;" id="saveButton" value="Сохранить ответы" />
+    <ul class="nav nav-tabs nav-pills" role="tablist">
+        @foreach (Questions Question in Model.Questions)
+        {
+            <li><a href="#question_@Question.ID" role="presentation" data-toggle="tab">Вопрос @Model.GetCounter()</a></li>
+        }
+    </ul>
+    <div class="tab-content">
+        @foreach (Questions Question in Model.Questions)
+        {
+            <div role="tabpanel" class="tab-pane" id="question_@Question.ID">
+                Вопрос: @Question.Question
+                <br />
+                Ваш ответ:
+                <select id="AnswerQuestion_@Question.ID">
+                    @foreach (Answers Answer in Question.Answers)
+                    {
+                        <option value="@Answer.ID">@Answer.AnswerText</option>
+                    }
+                </select>
+            </div>
+        }
+    </div>
+</div>
+
+<script type="text/javascript">
+    let Answer = [
+        @foreach (Questions Question in Model.Questions)
+        {
+            <text>
+                {
+                    User: "@Model.UserName",
+                    QuestionID: @Question.ID,
+                    AnswerID: 'AnswerQuestion_@Question.ID',
+                },
+            </text>
+        }
+    ];
+    $('#saveButton').click(function(){
+        for(index in Answer){
+            Answer[index]['AnswerID'] = $('#'+Answer[index]['AnswerID']).val();
+        }
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("SaveSurvey", "Home")",
+            data: {
+                Answers: JSON.stringify(Answer),
+            },
+            success: function(){
+                alert("Ваши ответы успешно записаны!");
+                window.location.replace('@Url.Action("Index", "Home")')
+            },
+            beforeSend: function(){
+                $('#saveButton').val("Данные отправляются!");
+                $('#saveButton').removeClass('btn-success');
+                $('#saveButton').addClass('btn-danger');
+                $('#saveButton').prop( "disabled", true);
+            },
+            error: function () {
+                alert("При сохранении ответов возникла ошибка. \r\nПовторите попытку позже.");
+                $('#saveButton').val("Сохранить ответы");
+                $('#saveButton').removeClass('btn-danger');
+                $('#saveButton').addClass('btn-success');
+                $('#saveButton').prop("disabled", false);
+            },
+
+
+        });
+    });
+</script>
