@@ -53,7 +53,7 @@ namespace Testing.Controllers
             }
             db.SaveChanges();
         }
-        public ActionResult GetStatistics()
+        public IActionResult GetStatistics()
         {
             VM_GetStatistics ViewModel = new VM_GetStatistics();
             ViewModel.ResultTableRecord = new List<VM_GetStatistics_ResultTableRecord>();
